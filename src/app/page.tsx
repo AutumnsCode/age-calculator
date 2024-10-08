@@ -1,101 +1,93 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import CustomInput from '@/components/custom-input';
+import { CustomOutput } from '@/components/custom-output';
+import { calculator } from '@/hooks';
+import { FormSchema } from '@/schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
+import React, { useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
-}
+type FormFields = z.infer<typeof FormSchema>;
+const Home = () => {
+	const [outputYear, setOutputYear] = useState<number | undefined>(undefined)
+	const [outputMonth, setOutputMonth] = useState<number | undefined>(undefined);
+	const [outputDay, setOutputDay] = useState<number | undefined>(undefined);
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+		reset,
+	} = useForm<FormFields>({
+		resolver: zodResolver(FormSchema),
+	});
+
+	const onSubmit: SubmitHandler<FormFields> = (data) => {
+		const { day, month, year } = data;
+
+		const { outputDay, outputMonth, outputYear } = calculator(day, month, year);
+		
+
+		setOutputDay(outputDay);
+		setOutputMonth(outputMonth);
+		setOutputYear(outputYear);
+		reset()
+	};
+
+	return (
+		<main className='w-[calc(100%-2rem)] mx-auto bg-white rounded-3xl rounded-br-[88px] max-w-[840px] max-sm:mt-[88px] h-full px-6 pt-[50px] pb-11'>
+			<h1 className='sr-only'>Age Calculator</h1>
+			<form onSubmit={handleSubmit(onSubmit)}>
+				<div className='flex gap-x-4 mb-8 sm:gap-x-6 md:gap-x-8 md:mb-0'>
+					<CustomInput<FormFields>
+						name='day'
+						register={register}
+						errors={errors}
+						isSubmitting={isSubmitting}
+						placeholder='DD'
+						label='day'
+						max={2}
+					/>
+					<CustomInput<FormFields>
+						name='month'
+						register={register}
+						errors={errors}
+						isSubmitting={isSubmitting}
+						placeholder='MM'
+						label='month'
+						max={2}
+					/>
+					<CustomInput<FormFields>
+						name='year'
+						register={register}
+						errors={errors}
+						placeholder='YYYY'
+						label='year'
+						max={4}
+						isSubmitting={isSubmitting}
+					/>
+				</div>
+				<div className='relative w-full flex justify-center items-center h-16 md:h-[94px] before:absolute before:w-full before:h-0.5 before:bg-background before:top-1/2 before:translate-y-1/2 md:justify-end'>
+					<button
+						type='submit'
+						className='h-16 w-16 bg-accent-purple rounded-full flex items-center justify-center z-30 md:w-[94px] md:h-[94px] focus-visible:outline-none hover:bg-foreground focus:bg-foreground disabled:bg-foreground/50'
+						disabled={isSubmitting}
+					>
+						<div className='max-md:w-[26px] max-md:h-[25px] relative md:w-[45px] md:h-[44px]'>
+							<Image src='/icon-arrow.svg' fill alt='icon' />
+						</div>
+					</button>
+				</div>
+			</form>
+			<div className='mt-10 md:mt-4'>
+				<CustomOutput output={outputYear} label='year' />
+				<CustomOutput output={outputMonth} label='month' />
+				<CustomOutput output={outputDay} label='day' />
+			</div>
+		</main>
+	);
+};
+
+export default Home;
