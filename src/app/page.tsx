@@ -37,7 +37,7 @@ const Home = () => {
 	};
 
 	return (
-		<main className='w-[calc(100%-2rem)] mx-auto bg-white rounded-3xl rounded-br-[88px] max-w-[840px] max-sm:mt-[88px] h-full px-6 pt-[50px] pb-11'>
+		<main className='w-[calc(100%-2rem)] mx-auto bg-white rounded-3xl rounded-br-[88px] max-w-[840px] max-sm:mt-[88px] h-full px-6 pt-[50px] pb-11 md:px-14 md:pt-14 md:pb-12'>
 			<h1 className='sr-only'>Age Calculator</h1>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className='flex gap-x-4 mb-8 sm:gap-x-6 md:gap-x-8 md:mb-0'>
